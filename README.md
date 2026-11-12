@@ -1,51 +1,69 @@
-# **VeriMotion: Layer-Wise Language-to-Motion Planning with Shared STL Robustness Feedback**
+# VeriMotion: Layer-Wise Language-to-Motion Planning with Shared STL Robustness Feedback
+
+This repository contains the anonymous code release of **VeriMotion**, a closed-loop
+architecture for translating natural-language instructions into executable robot
+motion plans under spatial, temporal, and logical constraints.
+
+![Framework Overview](T3%20Planner%20Framework.png)
 
 ## Overview
-This repository contains the code implementation for our paper: [ $T^3$ Planner: A Self-Correcting LLM Framework for Robotic Motion Planning with Temporal Logic](https://arxiv.org/pdf/2510.16767)
-The framework decomposes spatio-temporal task constraints via three modules, each of which stimulates an LLM to generate candidate trajectory sequences and examines their feasibility via a Signal Temporal Logic (STL) verifier until one that satisfies complex spatial, temporal, and logical constraints is found.
 
-![VeriMotion Framework](T3%20Planner%20Framework.png)
+Natural-language robot instructions may couple *what* must be achieved, *in which
+order*, *within what time intervals*, and *under which motion constraints*.
+VeriMotion resolves such instructions across three representations and
+granularities:
+
+1. **Task Planner** — resolves spatial predicates, implicit prerequisites,
+   conditional branches, and ordering relations into an untimed subgoal sequence.
+2. **Time Planner** — assigns timestamps to the subgoal sequence, instantiating
+   deadlines, durations, and operating windows.
+3. **Trajectory Planner** — generates an executable motion controller (Python
+   code) that realizes the timed waypoints under kinematic and velocity limits.
+
+Each layer is verified against a **shared STL specification**. Negative STL
+robustness identifies the layer at which a violation appears and triggers
+regeneration at that layer, which limits error propagation while retaining a
+route for cross-layer repair. The trajectory layer additionally uses a dual-layer
+motion verification loop (Python syntax pre-compilation + STL checking of
+simulated trajectories against a case library).
+
+The framework supports multiple LLM backbones, including frontier API models and
+a distilled **Qwen3-4B** variant for edge deployment.
+
+## Repository Scope
+
+This release supports the following workflows.
+
+1. Run VeriMotion end-to-end on the released test scenarios.
+2. Evaluate success rate (SR), average LLM calls (AC), and average call time (AT)
+   against the reported baselines.
+3. Inspect the prompting scheme, verification code, and the case library.
+4. Reproduce the ablation variants (w/o self-correction, w/o decomposition).
+
+
+
+## Scenarios and Datasets
+
+Three simulated 2D scenarios are supported. Test sets pair each natural-language
+instruction with a manually verified ground-truth STL specification, isolating
+translation errors from planning evaluation.
+
+| Scenario   | Description                                                        | Test samples |
+|------------|--------------------------------------------------------------------|--------------|
+| Household  | 8-room household environment with labeled spatial regions          | 400          |
+| Chip       | Sequential key–door task scenario adapted from Chip's Challenge    | 300          |
+| Navigation | Battery-constrained navigation with dynamic charging-station visits| 300          |
+
+Instructions are additionally categorized into four complexity levels —
+**Atomic, Basic, Composite, Complex** — by the number of temporal and spatial
+operators in the STL formalization (see `docs/task_complexity.md`).
 
 ## Installation
 
-1.  **Clone the repository**
+```bash
+git clone &lt;anonymous-repo-url&gt;
+cd VeriMotion
 
-2.  **Create and activate a Python virtual environment**
-
-3.  **Install dependencies**
-
-4.  **Configure environment variables**
-    Create `.env` file and fill in the necessary configurations, such as your API keys.
-    ```env
-    # .env
-    SCENARIO="household"
-    Ge_MODEL="deepseek"
-    HOUSEHOLD_DATA_FILE=".\test_dataset\household\test.jsonl"
-    # Add your LLM API key
-    # OPENAI_API_KEY="your-api-key-here"
-    ```
-
-## Usage
-
-Execute the corresponding main file for the scenario you wish to run.
-
--   **Run the Household scenario:**
-    ```bash
-    python main_household.py
-    ```
-
-
-After execution, the results (including logs, plots, and JSONL files) will be saved in the `result/<SCENARIO>/<MODEL>` directory.
-
-
-If you find this repository useful in your research, please cite the following paper:
-```bibtex
-@misc{li2025t3plannerselfcorrectingllm,
-      title={T3 Planner: A Self-Correcting LLM Framework for Robotic Motion Planning with Temporal Logic}, 
-      author={Jia Li and Guoxiang Zhao},
-      year={2025},
-      archivePrefix={arXiv},
-      primaryClass={cs.RO},
-      url={https://arxiv.org/abs/2510.16767}, 
-}
-```
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install -r requirements.txt
