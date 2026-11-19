@@ -56,14 +56,28 @@ translation errors from planning evaluation.
 
 Instructions are additionally categorized into four complexity levels —
 **Atomic, Basic, Composite, Complex** — by the number of temporal and spatial
-operators in the STL formalization (see `docs/task_complexity.md`).
+operators in the STL formalization.
 
 ## Installation
 
 ```bash
-git clone &lt;anonymous-repo-url&gt;
 cd VeriMotion
 
 python -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
+source venv/bin/activate          
 pip install -r requirements.txt
+```
+
+## Repository Structure
+
+| File | Description |
+| --- | --- |
+| `main_household.py` | Main entry point of the program for the Household scenario. |
+| `prompt_household.py` | Stores all prompts required by the Household pipeline. |
+| `llm_function_household.py` | Implements the LLM-dependent functions used in the pipeline. |
+| `controller.py` | Controller produced by the trajectory motion planner. |
+| `STL_check.py` | Computes the STL robustness score for plan and trajectory verification. |
+| `constants/` | Common prompt definitions and output-format specifications. |
+| `train_dataset/` | Fine-tuning training datasets for all three evaluated scenarios. |
+| `test_dataset/` | Test datasets for evaluation. |
+
