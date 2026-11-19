@@ -4,7 +4,7 @@ This repository contains the anonymous code release of **VeriMotion**, a closed-
 architecture for translating natural-language instructions into executable robot
 motion plans under spatial, temporal, and logical constraints.
 
-![Framework Overview](T3%20Planner%20Framework.png)
+![Framework Overview](Framework.png)
 
 ## Overview
 
