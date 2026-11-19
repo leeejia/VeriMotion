@@ -27,7 +27,7 @@ from stl_checker import (
     stl_monitor_for_pwl_sampling_period,
     stl_monitor_for_pwl,
 )
-from controller_from_llm15_true import Controller
+from controller import Controller
 from prompt_household import household, examples_llm10, examples_llm11, examples_llm12
 
 logging.basicConfig(
